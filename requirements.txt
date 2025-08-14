@@ -1,0 +1,20 @@
+# Basis
+pyyaml
+requests
+gitpython
+python-dotenv
+rich
+
+# Model-APIs (du brauchst nur die, die du nutzt)
+anthropic
+openai
+
+# CLI & Workflow
+click
+typer
+
+# Optional – nur wenn dein Repo Node.js-Checks macht
+subprocess-run
+
+# Debug & Logging
+loguru

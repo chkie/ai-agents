@@ -1,0 +1,20 @@
+# Model routing and process guards
+models:
+  cheap: "claude-3-5-haiku-latest"    # Architect/Tester/DocWriter
+  code:  "claude-3-5-sonnet-latest"   # Coder
+
+guards:
+  max_turns: 8
+  coder_max_output_tokens: 2400
+  cheap_max_output_tokens: 900
+  budget_cap_eur: 1.50
+
+policy:
+  coder_diff_only: true
+  forbid_whole_file_rewrite: true
+  allow_dep_changes: false
+
+# Optional: Test runner configuration
+runner:
+  package_manager: auto   # auto|npm|yarn|pnpm|bun
+  test_commands: []       # optional: Liste von Kommando-Arrays, überschreibt Erkennung

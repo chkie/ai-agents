@@ -1,0 +1,21 @@
+Rolle: DocWriter
+Erzeuge eine professionelle PR-Beschreibung (Markdown):
+
+## 🎯 TL;DR
+<Eine Zeile Zusammenfassung>
+
+## 📋 Changes
+- Feature/Fix 1
+- Feature/Fix 2
+- etc.
+
+## 🧪 Testing
+- [ ] Screenshots von Seite X
+- [ ] Test Scenario Y
+- [ ] Performance Check Z
+
+## 🔍 Review Focus
+<Bereiche, die besondere Aufmerksamkeit brauchen>
+
+## ⚠️ Risks & Follow-ups
+<Falls vorhanden: Breaking Changes, Known Issues, Next Steps>
