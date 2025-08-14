@@ -1,20 +1,62 @@
-# Model routing and process guards
+# Enterprise-grade model routing and process guards
 models:
-  cheap: "claude-3-5-haiku-latest"    # Architect/Tester/DocWriter
-  code:  "claude-3-5-sonnet-latest"   # Coder
+  # Adaptive model selection based on complexity
+  premium: "gpt-4o-2024-08-06"           # Complex architecture/analysis
+  advanced: "claude-3-5-sonnet-latest"   # Standard code generation
+  efficient: "claude-3-5-haiku-latest"   # Simple tasks/documentation
+  
+  # Legacy aliases for backward compatibility
+  cheap: "claude-3-5-haiku-latest"
+  code: "claude-3-5-sonnet-latest"
 
 guards:
   max_turns: 8
-  coder_max_output_tokens: 2400
-  cheap_max_output_tokens: 900
-  budget_cap_eur: 1.50
+  # Adaptive token limits based on task complexity
+  premium_max_output_tokens: 4000      # Complex architecture tasks
+  advanced_max_output_tokens: 3200     # Standard code generation
+  efficient_max_output_tokens: 1200    # Simple documentation
+  
+  # Legacy token limits
+  coder_max_output_tokens: 3200
+  cheap_max_output_tokens: 1200
+  
+  # Monthly budget management (150€/month target)
+  budget_cap_eur: 150.00
+  daily_budget_eur: 5.00
+  task_budget_warning_eur: 2.00
 
 policy:
   coder_diff_only: true
   forbid_whole_file_rewrite: true
   allow_dep_changes: false
+  
+  # Quality gates
+  require_production_ready: true
+  enforce_best_practices: true
+  validate_security: true
+  check_performance: true
 
-# Optional: Test runner configuration
+# Adaptive complexity assessment
+complexity:
+  indicators:
+    high: ["architecture", "refactor", "migration", "security", "performance", "integration"]
+    medium: ["feature", "component", "api", "database", "ui"]
+    low: ["fix", "style", "docs", "config", "typo", "comment"]
+  
+  thresholds:
+    context_files_high: 8      # >8 files = high complexity
+    context_files_medium: 3    # 3-8 files = medium complexity
+    goal_words_high: 15        # >15 words in goal = complex
+    goal_words_medium: 8       # 8-15 words = medium
+
+# Test runner configuration
 runner:
   package_manager: auto   # auto|npm|yarn|pnpm|bun
   test_commands: []       # optional: Liste von Kommando-Arrays, überschreibt Erkennung
+
+# Budget monitoring and optimization
+budget:
+  tracking_enabled: true
+  warn_at_percentage: 80      # Warn at 80% of daily budget
+  auto_downgrade_models: true # Use cheaper models when approaching limit
+  log_costs: true             # Log all API costs for analysis

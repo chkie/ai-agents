@@ -1,7 +1,7 @@
 import pathlib
 import glob
 
-ALLOW_EXT = {".svelte",".ts",".tsx",".js",".jsx",".md",".css",".scss"}
+ALLOW_EXT = {".svelte",".ts",".tsx",".js",".jsx",".md",".css",".scss",".py"}
 
 def read_small_file(path: pathlib.Path, max_bytes: int = 200000) -> str:
     data = path.read_bytes()
