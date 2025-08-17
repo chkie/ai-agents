@@ -2,10 +2,12 @@
 Premium Features for 100€/month AI Agent System
 Implements high-value features to justify premium cost target.
 """
+
 import logging
-from typing import Dict, List, Optional
+from typing import Dict
+
 from rich.console import Console
-from rich.panel import Panel
+
 from .llm import complete
 
 logger = logging.getLogger(__name__)
@@ -14,23 +16,25 @@ console = Console()
 
 class PremiumQualityEngine:
     """Premium quality features for maximum value delivery."""
-    
+
     def __init__(self, config: Dict):
         self.config = config
         self.budget_config = config.get("budget", {})
         self.policy_config = config.get("policy", {})
-        
+
     def should_enable_premium_features(self) -> bool:
         """Check if premium features should be enabled."""
         return self.budget_config.get("premium_quality_mode", False)
-    
-    def multi_pass_code_review(self, code_patch: str, model: str, max_tokens: int) -> str:
+
+    def multi_pass_code_review(
+        self, code_patch: str, model: str, max_tokens: int
+    ) -> str:
         """Perform multi-pass code review for premium quality."""
         if not self.policy_config.get("multi_pass_code_review", False):
             return ""
-        
+
         console.print("[bold yellow]🔍 Premium Multi-Pass Code Review[/bold yellow]")
-        
+
         review_prompt = f"""Du bist ein Senior Code Reviewer. Führe eine detaillierte Code-Review durch.
 
 CODE PATCH ZU REVIEWEN:
@@ -76,22 +80,27 @@ AUSGABE (Markdown):
 ```
 
 Bewerte kritisch wie ein Senior-Entwickler."""
-        
+
         try:
-            review_result = complete(model, "Du bist ein Senior Code Reviewer.", review_prompt, max_tokens=max_tokens//2)
+            review_result = complete(
+                model,
+                "Du bist ein Senior Code Reviewer.",
+                review_prompt,
+                max_tokens=max_tokens // 2,
+            )
             logger.info("Multi-pass code review completed")
             return review_result
         except Exception as e:
             logger.error(f"Multi-pass code review failed: {e}")
             return ""
-    
+
     def deep_security_analysis(self, context: str, model: str, max_tokens: int) -> str:
         """Perform deep security analysis for premium quality."""
         if not self.budget_config.get("enable_security_deep_scan", False):
             return ""
-        
+
         console.print("[bold red]🛡️ Premium Security Deep Scan[/bold red]")
-        
+
         security_prompt = f"""Du bist ein Senior Security Auditor. Führe eine tiefgreifende Sicherheitsanalyse durch.
 
 KONTEXT ZU ANALYSIEREN:
@@ -131,22 +140,29 @@ AUSGABE:
 ```
 
 Analysiere wie ein Penetration Tester."""
-        
+
         try:
-            security_result = complete(model, "Du bist ein Senior Security Auditor.", security_prompt, max_tokens=max_tokens//2)
+            security_result = complete(
+                model,
+                "Du bist ein Senior Security Auditor.",
+                security_prompt,
+                max_tokens=max_tokens // 2,
+            )
             logger.info("Deep security analysis completed")
             return security_result
         except Exception as e:
             logger.error(f"Deep security analysis failed: {e}")
             return ""
-    
-    def performance_profiling(self, code_patch: str, model: str, max_tokens: int) -> str:
+
+    def performance_profiling(
+        self, code_patch: str, model: str, max_tokens: int
+    ) -> str:
         """Perform performance profiling analysis."""
         if not self.budget_config.get("enable_performance_profiling", False):
             return ""
-        
+
         console.print("[bold blue]⚡ Premium Performance Profiling[/bold blue]")
-        
+
         performance_prompt = f"""Du bist ein Senior Performance Engineer. Analysiere die Performance-Auswirkungen.
 
 CODE ZU ANALYSIEREN:
@@ -189,22 +205,27 @@ AUSGABE:
 ```
 
 Analysiere wie ein Performance-Experte."""
-        
+
         try:
-            performance_result = complete(model, "Du bist ein Senior Performance Engineer.", performance_prompt, max_tokens=max_tokens//2)
+            performance_result = complete(
+                model,
+                "Du bist ein Senior Performance Engineer.",
+                performance_prompt,
+                max_tokens=max_tokens // 2,
+            )
             logger.info("Performance profiling completed")
             return performance_result
         except Exception as e:
             logger.error(f"Performance profiling failed: {e}")
             return ""
-    
+
     def architecture_validation(self, plan: str, model: str, max_tokens: int) -> str:
         """Validate architecture decisions against enterprise patterns."""
         if not self.policy_config.get("architecture_validation", False):
             return ""
-        
+
         console.print("[bold cyan]🏗️ Premium Architecture Validation[/bold cyan]")
-        
+
         arch_prompt = f"""Du bist ein Enterprise Solution Architect. Validiere die Architektur-Entscheidungen.
 
 ARCHITECTURE PLAN:
@@ -245,9 +266,14 @@ AUSGABE:
 ```
 
 Bewerte wie ein Enterprise Architect."""
-        
+
         try:
-            arch_result = complete(model, "Du bist ein Enterprise Solution Architect.", arch_prompt, max_tokens=max_tokens//2)
+            arch_result = complete(
+                model,
+                "Du bist ein Enterprise Solution Architect.",
+                arch_prompt,
+                max_tokens=max_tokens // 2,
+            )
             logger.info("Architecture validation completed")
             return arch_result
         except Exception as e:
