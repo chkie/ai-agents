@@ -2,9 +2,5 @@
   "default": true,
   "MD013": { "line_length": 120 },
   "MD041": false,
-  "ignores": [
-    ".venv/**",
-    "**/site-packages/**",
-    "**/*.dist-info/**"
-  ]
+  "ignores": [".venv/**", "**/site-packages/**", "**/*.dist-info/**"]
 }
