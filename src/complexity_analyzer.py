@@ -5,7 +5,7 @@ Analyzes task complexity to optimize model selection and token allocation.
 
 import re
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import yaml
 

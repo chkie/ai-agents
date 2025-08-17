@@ -1,0 +1,12 @@
+exclude_dirs:
+  - .venv
+  - __pycache__
+  - .git
+  - build
+  - dist
+  - .mypy_cache
+  - .pytest_cache
+
+skips:
+  - B101  # Skip assert_used test
+  - B601  # Skip paramiko calls (if any)
