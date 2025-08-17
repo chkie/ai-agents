@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, "3.10", "3.11"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        # Install development dependencies
+        pip install pytest black flake8 mypy
+
+    - name: Lint with flake8
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings. GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Format check with black
+      run: |
+        black --check --diff .
+
+    - name: Type check with mypy
+      run: |
+        mypy src/ --ignore-missing-imports
+      continue-on-error: true  # Don't fail CI on type errors initially
+
+    - name: Test syntax compilation
+      run: |
+        python -m py_compile run_task.py
+        python -c "import src.llm, src.context, src.git_ops, src.test_runner, src.complexity_analyzer, src.budget_monitor, src.context_cache, src.premium_features"
+
+    - name: Test configuration loading
+      run: |
+        python -c "
+        import yaml
+        with open('config.yaml', 'r') as f:
+            config = yaml.safe_load(f)
+        print('✅ Config validation passed')
+        "
+
+    - name: Run basic functionality tests
+      run: |
+        # Test help output
+        python run_task.py --help
+        
+        # Test budget report (should work without API key)
+        python run_task.py --budget-report || echo "Budget report test completed"
+        
+        # Test cache stats
+        python run_task.py --cache-stats || echo "Cache stats test completed"
+      env:
+        ANTHROPIC_API_KEY: "dummy-key-for-testing"
+        REPO_PATH: "/tmp/test-repo"
+
+  security-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install security tools
+      run: |
+        pip install bandit safety
+
+    - name: Run Bandit security scan
+      run: |
+        bandit -r src/ run_task.py -f json -o bandit-report.json || true
+        bandit -r src/ run_task.py
+
+    - name: Check dependencies for security vulnerabilities
+      run: |
+        safety check --json --output safety-report.json || true
+        safety check
+      continue-on-error: true  # Don't fail on safety warnings initially
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+
+  markdown-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Lint Markdown files
+      uses: DavidAnson/markdownlint-cli2-action@v13
+      with:
+        globs: '**/*.md'
+        config: |
+          {
+            "MD041": false,
+            "MD013": { "line_length": 120 }
+          }

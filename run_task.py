@@ -11,6 +11,8 @@ from src.git_ops import ensure_branch, apply_patch, commit_and_push, create_pr
 from src.test_runner import run_checks
 from src.complexity_analyzer import ComplexityAnalyzer, ComplexityLevel
 from src.budget_monitor import BudgetMonitor
+from src.context_cache import ContextCache
+from src.premium_features import PremiumQualityEngine
 
 load_dotenv()
 
@@ -39,17 +41,43 @@ def main():
     parser.add_argument("--force-model", help="Force specific model (overrides complexity analysis)")
     parser.add_argument("--budget-report", action="store_true", help="Show budget report and exit")
     parser.add_argument("--complexity-only", action="store_true", help="Analyze complexity only and exit")
+    parser.add_argument("--cache-reset", help="Reset cache (session-id or 'all')")
+    parser.add_argument("--cache-stats", action="store_true", help="Show cache statistics")
+    parser.add_argument("--no-cache", action="store_true", help="Disable caching for this run")
     args = parser.parse_args()
     
     console = Console()
     
-    # Initialize enterprise components
+    cfg = load_cfg()
+    
+    # Initialize premium enterprise components
     complexity_analyzer = ComplexityAnalyzer()
     budget_monitor = BudgetMonitor()
+    context_cache = ContextCache()
+    premium_engine = PremiumQualityEngine(cfg)
     
     # Handle special commands
     if args.budget_report:
         console.print(Panel(budget_monitor.generate_budget_report(), title="💰 Budget Report"))
+        return
+    
+    if args.cache_reset:
+        if args.cache_reset.lower() == 'all':
+            context_cache.reset_cache()
+        else:
+            context_cache.reset_cache(args.cache_reset)
+        return
+    
+    if args.cache_stats:
+        stats = context_cache.get_cache_stats()
+        context_cache.list_sessions()
+        console.print(Panel(
+            f"Sessions: {stats['sessions']}\n"
+            f"Total Files: {stats['total_files']}\n"
+            f"Current Session: {stats['current_session'] or 'None'}\n"
+            f"Max Files/Session: {stats['max_files_per_session']}",
+            title="📊 Cache Statistics"
+        ))
         return
     
     # Check if goal is required for normal operations
@@ -62,8 +90,9 @@ def main():
         console.print("[red]❌ Daily or monthly budget exceeded. Task aborted.[/red]")
         console.print(budget_monitor.generate_budget_report())
         return
-
-    cfg = load_cfg()
+    
+    # Show budget warning if needed
+    budget_monitor.show_budget_warning_if_needed()
     repo_path = os.getenv("REPO_PATH")
     if not repo_path or not os.path.isdir(repo_path):
         raise SystemExit("Set REPO_PATH in .env to your target repository path")
@@ -78,50 +107,62 @@ def main():
         console.print(f"[yellow]Estimated Cost:[/yellow] {cost_estimate['avg']:.3f}€ (range: {cost_estimate['min']:.3f}€-{cost_estimate['max']:.3f}€)")
         return
     
-    # Model Selection (adaptive or forced)
+    # Premium Model Selection (all roles use premium models for 100€/month target)
     if args.force_model:
         architect_model = code_model = tester_model = doc_model = args.force_model
         console.print(f"[yellow]Using forced model:[/yellow] {args.force_model}")
     else:
-        # Adaptive model selection
-        architect_model = complexity_analyzer.get_model_recommendation(complexity)
-        code_model = complexity_analyzer.get_model_recommendation(complexity)
+        # Premium model selection - all roles use high-quality models
+        architect_model = cfg["models"].get("architect", "claude-3-5-sonnet-latest")
+        code_model = cfg["models"].get("coder", "claude-3-5-sonnet-latest")
+        tester_model = cfg["models"].get("tester", "claude-3-5-sonnet-latest")
+        doc_model = cfg["models"].get("docwriter", "claude-3-5-sonnet-latest")
         
-        # Budget-aware model downgrading
-        estimated_cost = complexity_analyzer.estimate_cost_impact(complexity)["avg"]
-        if budget_monitor.should_downgrade_model(estimated_cost):
-            architect_model = budget_monitor.get_downgraded_model(architect_model)
-            code_model = budget_monitor.get_downgraded_model(code_model)
-            console.print(f"[yellow]Models downgraded due to budget constraints[/yellow]")
-        
-        # Use efficient models for tester and docwriter to save costs
-        tester_model = cfg["models"].get("efficient", "claude-3-5-haiku-latest")
-        doc_model = cfg["models"].get("efficient", "claude-3-5-haiku-latest")
+        # No downgrading in premium mode - quality over cost
+        console.print(f"[green]🎆 Premium mode: All roles using {architect_model.split('-')[0]} for maximum quality[/green]")
     
-    # Adaptive Token Limits
-    architect_tokens = complexity_analyzer.get_token_limit(complexity, "architect")
-    code_tokens = complexity_analyzer.get_token_limit(complexity, "coder")
-    tester_tokens = complexity_analyzer.get_token_limit(complexity, "tester")
-    doc_tokens = complexity_analyzer.get_token_limit(complexity, "docwriter")
+    # Premium Token Limits for Maximum Quality
+    quality_multiplier = cfg.get("complexity", {}).get("quality_multipliers", {}).get(complexity.value, 1.0)
     
-    # Display enterprise dashboard
+    architect_tokens = int(cfg["guards"].get("architect_max_tokens", 6000) * quality_multiplier)
+    code_tokens = int(cfg["guards"].get("coder_max_tokens", 5000) * quality_multiplier)
+    tester_tokens = int(cfg["guards"].get("tester_max_tokens", 4000) * quality_multiplier)
+    doc_tokens = int(cfg["guards"].get("docwriter_max_tokens", 4000) * quality_multiplier)
+    
+    console.print(f"[blue]📊 Premium tokens: Architect {architect_tokens}, Coder {code_tokens}, Tester {tester_tokens}, Doc {doc_tokens}[/blue]")
+    
+    # Calculate premium cost target
+    target_cost_per_task = cfg.get("budget", {}).get("target_cost_per_task", 0.440)
+    estimated_premium_cost = target_cost_per_task  # Target cost regardless of complexity
+    
+    # Display premium dashboard
     console.print(Panel.fit(
-        f"[bold cyan]Enterprise Multi-Agent System[/bold cyan]\n"
-        f"Complexity: [yellow]{complexity.value.upper()}[/yellow] | "
-        f"Estimated Cost: [green]{estimated_cost:.3f}€[/green] | "
-        f"Budget Status: [green]OK[/green]" if not budget_status["daily_warning"] else f"Budget Status: [yellow]WARNING[/yellow]",
-        title="🚀 AI Agents Dashboard"
+        f"[bold magenta]Premium Enterprise AI Agent[/bold magenta]\n"
+        f"Complexity: [yellow]{complexity.value.upper()}[/yellow] (Quality: {quality_multiplier:.1f}x) | "
+        f"Target Cost: [green]{estimated_premium_cost:.3f}€[/green] | "
+        f"Premium Mode: [green]ACTIVE[/green] | "
+        f"Budget: [blue]{budget_status['daily_spend']:.2f}€/3.33€ daily[/blue]",
+        title="🎆 Premium AI Agents Dashboard"
     ))
 
     # 1) Enterprise Architect
     console.print("[bold cyan]🏗️  Enterprise Architect Phase[/bold cyan]")
     system_arch = f"Du bist ein Senior Software Architect. Nutze deine Expertise für enterprise-grade Lösungen. Aufgabenkomplexität: {complexity.value.upper()}"
     
-    # Enhanced context for architect
+    # Premium context collection with enhanced analysis
     context_str = ""
     if context_files:
-        context_str = collect_context(repo_path, context_files)
-        console.print(f"[green]📁 Context collected:[/green] {len(context_files)} files")
+        use_cache = not args.no_cache
+        context_str = collect_context(repo_path, context_files, args.goal, use_cache)
+        
+        # Premium context analysis
+        context_analysis = f"\n=== PREMIUM CONTEXT ANALYSIS ===\nFiles: {len(context_files)} specs\nComplexity: {complexity.value.upper()}\nQuality Multiplier: {quality_multiplier:.1f}x\nTarget Cost: {target_cost_per_task:.3f}€\n"
+        context_str += context_analysis
+        
+        if use_cache:
+            console.print(f"[green]📁 Premium context:[/green] {len(context_files)} files + enhanced analysis")
+        else:
+            console.print(f"[green]📁 Premium direct:[/green] {len(context_files)} files + deep analysis")
     
     prompt_arch = f"""{read('roles/architect.txt')}
 
@@ -129,7 +170,7 @@ AUFGABE:
 {args.goal}
 
 KOMPLEXITÄT: {complexity.value.upper()}
-GESCHÄTZTE KOSTEN: {estimated_cost:.3f}€
+GESCHÄTZTE KOSTEN: {target_cost_per_task:.3f}€
 
 KONTEXT-DATEIEN ({len(context_files)} Dateien):
 {context_str if context_str else "(keine zusätzlichen Kontext-Dateien)"}
@@ -176,8 +217,17 @@ IMPLEMENTATION CONTEXT:
 PROJEKT-KONTEXT:
 {context_str if context_str else "(Verwende Best-Practice-Standards)"}
 
-QUALITÄTS-ZIEL: Übertreffe Claude 4 Sonnet Max durch Clean Code, Security, Performance.
-"""
+CACHE-INFO: {'Cached context reused' if context_str and not args.no_cache else 'Fresh context collected'}
+
+PREMIUM QUALITÄTS-ZIEL: Übertreffe Claude 4 Sonnet Max durch:
+- Enterprise-Grade Architecture
+- Production-Ready Implementation
+- Comprehensive Security Analysis
+- Performance-Optimized Solutions
+- Detailed Documentation
+- Multi-Pass Quality Validation
+
+COST-TARGET: {target_cost_per_task:.3f}€ pro Task (Premium-Service-Level)"""
 
     code_resp = complete(code_model, system_code, prompt_code, max_tokens=code_tokens)
     

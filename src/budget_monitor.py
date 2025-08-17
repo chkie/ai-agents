@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, asdict
 from pathlib import Path
 import yaml
+from rich.console import Console
 
 
 @dataclass
@@ -31,6 +32,7 @@ class BudgetMonitor:
         self.config = self._load_config(config_path)
         self.budget_config = self.config.get("budget", {})
         self.guards = self.config.get("guards", {})
+        self.console = Console()
         self.cost_log_path = Path(".ai_agents_costs.json")
         
         # Budget limits
@@ -167,6 +169,17 @@ class BudgetMonitor:
             "remaining_monthly": remaining_monthly,
             "budget_exceeded": daily_utilization >= 100 or monthly_utilization >= 100
         }
+    
+    def show_budget_warning_if_needed(self) -> bool:
+        """Show budget warning in TTY if approaching limits. Returns True if warning shown."""
+        status = self.check_budget_status()
+        
+        if status["daily_utilization"] >= 80:
+            self.console.print("\n[yellow]⚠️ BUDGET WARNING ⚠️[/yellow]")
+            self.console.print(f"[yellow]Daily budget: {status['daily_spend']:.3f}€ / {status['daily_budget']}€ ({status['daily_utilization']:.1f}%)[/yellow]")
+            self.console.print(f"[yellow]Recommendation: Consider using --force-model claude-3-5-haiku-latest for cost efficiency[/yellow]\n")
+            return True
+        return False
     
     def should_downgrade_model(self, estimated_cost: float) -> bool:
         """Check if model should be downgraded due to budget constraints."""

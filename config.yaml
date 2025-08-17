@@ -1,9 +1,15 @@
-# Enterprise-grade model routing and process guards
+# Premium Enterprise AI Agent - Optimized for 100€/month at 90h/month
 models:
-  # Adaptive model selection based on complexity
-  premium: "gpt-4o-2024-08-06"           # Complex architecture/analysis
-  advanced: "claude-3-5-sonnet-latest"   # Standard code generation
-  efficient: "claude-3-5-haiku-latest"   # Simple tasks/documentation
+  # Optimized model selection for cost-efficiency with quality
+  premium: "claude-3-5-sonnet-latest"     # Enterprise architecture/analysis
+  advanced: "claude-3-5-sonnet-latest"    # Premium code generation
+  efficient: "claude-3-5-haiku-latest"    # Cost-efficient documentation
+  
+  # Role-specific optimized model assignment
+  architect: "claude-3-5-haiku-latest"    # Cost-efficient architecture planning
+  coder: "claude-3-5-sonnet-latest"       # Premium code generation
+  tester: "claude-3-5-sonnet-latest"      # Premium quality assurance
+  docwriter: "claude-3-5-haiku-latest"    # Cost-efficient documentation
   
   # Legacy aliases for backward compatibility
   cheap: "claude-3-5-haiku-latest"
@@ -11,52 +17,92 @@ models:
 
 guards:
   max_turns: 8
-  # Adaptive token limits based on task complexity
-  premium_max_output_tokens: 4000      # Complex architecture tasks
-  advanced_max_output_tokens: 3200     # Standard code generation
-  efficient_max_output_tokens: 1200    # Simple documentation
+  # Premium token limits for maximum quality output
+  premium_max_output_tokens: 6000      # Enterprise architecture tasks
+  advanced_max_output_tokens: 5000     # Premium code generation
+  efficient_max_output_tokens: 4000    # High-quality documentation
   
-  # Legacy token limits
-  coder_max_output_tokens: 3200
-  cheap_max_output_tokens: 1200
+  # Role-specific optimized limits for budget efficiency
+  architect_max_tokens: 3000           # Efficient architecture analysis (Haiku)
+  coder_max_tokens: 6000               # Premium implementations (Sonnet)
+  tester_max_tokens: 5000              # Reliable QA analysis (Sonnet)
+  docwriter_max_tokens: 2500           # Efficient documentation (Haiku)
   
-  # Monthly budget management (150€/month target)
-  budget_cap_eur: 150.00
-  daily_budget_eur: 5.00
-  task_budget_warning_eur: 2.00
+  # Legacy token limits (for backward compatibility)
+  coder_max_output_tokens: 5000
+  cheap_max_output_tokens: 4000
+  
+  # Target budget management (100€/month, 90h/month)
+  budget_cap_eur: 100.00
+  monthly_target_eur: 100.00            # 100€ per month
+  daily_target_eur: 3.33                # 100€ / 30 days
+  task_target_eur: 0.90                 # Optimized cost per task
+  quality_over_cost: true               # Prioritize quality over cost savings
 
 policy:
   coder_diff_only: true
   forbid_whole_file_rewrite: true
   allow_dep_changes: false
   
-  # Quality gates
+  # Premium quality gates
   require_production_ready: true
   enforce_best_practices: true
   validate_security: true
   check_performance: true
+  
+  # Premium features for 100€/month value
+  multi_pass_code_review: true        # Multiple review rounds
+  deep_security_analysis: true        # OWASP + custom security checks
+  performance_profiling: true         # Performance impact analysis
+  architecture_validation: true       # Architecture pattern compliance
+  code_quality_scoring: true          # Detailed quality metrics
+  comprehensive_testing: true         # Enhanced test strategy
+  documentation_completeness: true    # Full documentation requirements
 
-# Adaptive complexity assessment
+# Complexity assessment for optimal model selection
 complexity:
   indicators:
-    high: ["architecture", "refactor", "migration", "security", "performance", "integration"]
-    medium: ["feature", "component", "api", "database", "ui"]
-    low: ["fix", "style", "docs", "config", "typo", "comment"]
+    enterprise: ["migrate", "refactor.*architecture", "security.*framework", "performance.*optimization"]
+    high: ["architecture", "refactor", "migration", "security", "performance", "integration", "system"]
+    medium: ["feature", "component", "api", "database", "ui", "service", "module"]
+    low: ["fix", "style", "docs", "config", "typo", "comment", "update"]
   
   thresholds:
-    context_files_high: 8      # >8 files = high complexity
-    context_files_medium: 3    # 3-8 files = medium complexity
-    goal_words_high: 15        # >15 words in goal = complex
-    goal_words_medium: 8       # 8-15 words = medium
+    context_files_enterprise: 15   # >15 files = enterprise complexity
+    context_files_high: 8          # >8 files = high complexity
+    context_files_medium: 3        # 3-8 files = medium complexity
+    goal_words_enterprise: 25      # >25 words = enterprise
+    goal_words_high: 15            # >15 words = high
+    goal_words_medium: 8           # 8-15 words = medium
+    
+  # Quality multipliers for enhanced analysis
+  quality_multipliers:
+    enterprise: 2.0                # 2x more thorough analysis
+    high: 1.5                      # 1.5x more detailed
+    medium: 1.2                    # 1.2x enhanced
+    low: 1.0                       # Standard quality
 
 # Test runner configuration
 runner:
   package_manager: auto   # auto|npm|yarn|pnpm|bun
-  test_commands: []       # optional: Liste von Kommando-Arrays, überschreibt Erkennung
+  test_commands: []       # optional: List of command arrays, overrides detection
 
-# Budget monitoring and optimization
+# Budget management for 100€/month target
 budget:
   tracking_enabled: true
-  warn_at_percentage: 80      # Warn at 80% of daily budget
-  auto_downgrade_models: true # Use cheaper models when approaching limit
-  log_costs: true             # Log all API costs for analysis
+  target_monthly_eur: 100.00        # Exact monthly target
+  target_daily_eur: 3.33            # 100€ / 30 days
+  target_cost_per_task: 0.90        # Optimized cost per task
+  warn_at_percentage: 75             # Earlier warning for budget control
+  auto_downgrade_models: true        # Enable downgrade when approaching budget limits
+  log_costs: true
+  
+  # Premium features to increase value
+  enable_multi_pass_validation: true  # Multiple validation rounds
+  enable_code_review_mode: true       # Additional code review pass
+  enable_security_deep_scan: true     # Enhanced security analysis
+  enable_performance_profiling: true  # Performance analysis
+  
+  # Cost targeting
+  adjust_token_limits_for_cost: true  # Increase limits to hit cost target
+  premium_quality_mode: true          # Maximum quality regardless of cost

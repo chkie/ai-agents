@@ -1,20 +1,20 @@
-# Basis
-pyyaml
-requests
-gitpython
-python-dotenv
-rich
+# Core Dependencies
+pyyaml>=6.0
+python-dotenv>=1.0.0
+rich>=13.0.0
+gitpython>=3.1.0
 
-# Model-APIs (du brauchst nur die, die du nutzt)
-anthropic
-openai
+# AI Model APIs
+anthropic>=0.20.0
 
-# CLI & Workflow
-click
-typer
+# CLI & Workflow (optional, but recommended)
+click>=8.0.0
+typer>=0.9.0
 
-# Optional – nur wenn dein Repo Node.js-Checks macht
-subprocess-run
+# Logging (optional alternative to built-in logging)
+loguru>=0.7.0
 
-# Debug & Logging
-loguru
+# Development Dependencies (optional)
+# pytest>=7.0.0
+# black>=23.0.0
+# flake8>=6.0.0
