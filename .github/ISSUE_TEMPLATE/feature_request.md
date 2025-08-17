@@ -19,11 +19,13 @@ assignees: ''
 <!-- Describe a concrete use case for this feature -->
 
 ## Example Implementation
+
 ```python
 # If you have an idea how it could be implemented
 ```
 
 ## Impact
+
 - [ ] Affects Architect role
 - [ ] Affects Coder role  
 - [ ] Affects Tester role
@@ -34,6 +36,7 @@ assignees: ''
 - [ ] New dependency required
 
 ## Priority
+
 - [ ] Nice-to-have
 - [ ] Important for workflow
 - [ ] Critical for productivity

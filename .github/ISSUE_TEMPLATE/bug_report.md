@@ -10,6 +10,7 @@ assignees: ''
 <!-- A clear and concise description of what the bug is -->
 
 ## Steps to Reproduce
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -25,12 +26,14 @@ assignees: ''
 <!-- If applicable, add screenshots to help explain your problem -->
 
 ## Environment
+
 - OS: [e.g. macOS 14.0, Ubuntu 22.04]
 - Python Version: [e.g. 3.11.0]
 - AI Agents Version: [e.g. 1.0.0]
 - Used Model: [e.g. claude-3-5-sonnet-latest]
 
 ## Command and Configuration
+
 ```bash
 # The command used
 python run_task.py --goal "..." --context-files "..."
@@ -44,11 +47,13 @@ models:
 ```
 
 ## Logs and Error Messages
-```
+
+```text
 # Paste complete error message here
 ```
 
 ## Budget Status
+
 ```bash
 # Output from: python run_task.py --budget-report
 ```

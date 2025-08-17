@@ -16,20 +16,24 @@ assignees: ''
 <!-- What steps have you already taken? -->
 
 ## Configuration
+
 ```yaml
 # Your relevant config.yaml settings
 ```
 
 ## Commands
+
 ```bash
 # The commands you used
 ```
 
 ## Expected vs. Actual
+
 - **Expected**: What you expected to happen
 - **Actual**: What actually happened
 
 ## Environment
+
 - OS: [e.g. macOS, Ubuntu]
 - Python Version: [e.g. 3.11]
 - AI Agents Version: [e.g. main branch]

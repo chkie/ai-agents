@@ -213,4 +213,4 @@ budget:
 
 ---
 
-**Thank you for your contributions! 🙏**
+## Thank you for your contributions! 🙏

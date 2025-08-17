@@ -21,7 +21,7 @@ This AI-powered system automates your entire development workflow:
 
 ### Prerequisites
 
-- **Python 3.8+** 
+- **Python 3.8+**
 - **Anthropic API Key** (get it from [Anthropic Console](https://console.anthropic.com/))
 - **Git** (for repository operations)
 - **GitHub CLI** (optional, for PR creation)
@@ -55,6 +55,7 @@ cp .env.example .env
 ```
 
 **Required Environment Variables:**
+
 - `ANTHROPIC_API_KEY`: Your Anthropic API key
 - `REPO_PATH`: Absolute path to the repository you want to work on
 
@@ -154,12 +155,15 @@ python run_task.py --goal "Task" --no-cache
 ## 📋 Requirements
 
 ### System Requirements
+
 - Python 3.8 or higher
 - Git installed and configured
 - Internet connection for AI API calls
 
 ### Dependencies
+
 All dependencies are listed in `requirements.txt`:
+
 - `anthropic>=0.20.0` - Anthropic Claude API
 - `pyyaml>=6.0` - Configuration file parsing
 - `rich>=13.0.0` - Beautiful terminal output
@@ -167,6 +171,7 @@ All dependencies are listed in `requirements.txt`:
 - `python-dotenv>=1.0.0` - Environment variable management
 
 ### Optional Dependencies
+
 - `click>=8.0.0` - Enhanced CLI functionality
 - `typer>=0.9.0` - Advanced CLI features
 - `loguru>=0.7.0` - Enhanced logging
