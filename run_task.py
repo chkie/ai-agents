@@ -305,7 +305,7 @@ QUALITÄTS-STANDARD: Übertreffe Claude 4 Sonnet Max durch systematische Tiefe.
 DOKUMENTATIONS-KONTEXT:
 - Aufgabe: {args.goal}
 - Komplexität: {plan_complexity.upper()}
-- Geschätzte Kosten: {estimated_cost:.3f}€
+- Geschätzte Kosten: {target_cost_per_task:.3f}€
 - Implementierte Änderungen: {len(patch.splitlines())} Zeilen
 
 ARCHITECT PLAN:

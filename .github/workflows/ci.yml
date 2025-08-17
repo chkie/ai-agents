@@ -39,13 +39,13 @@ jobs:
     - name: Lint with flake8
       run: |
         # Stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,__pycache__,.git
         # Exit-zero treats all errors as warnings. GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.venv,__pycache__,.git
 
     - name: Format check with black
       run: |
-        black --check --diff .
+        black --check --diff . --exclude="\.venv|__pycache__|\.git"
 
     - name: Type check with mypy
       run: |
@@ -97,7 +97,7 @@ jobs:
     - name: Run Bandit security scan
       run: |
         bandit -r src/ run_task.py -f json -o bandit-report.json || true
-        bandit -r src/ run_task.py
+        bandit -r src/ run_task.py --exclude=.venv
 
     - name: Check dependencies for security vulnerabilities
       run: |
@@ -106,7 +106,7 @@ jobs:
       continue-on-error: true  # Don't fail on safety warnings initially
 
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-reports
@@ -120,11 +120,6 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Lint Markdown files
-      uses: DavidAnson/markdownlint-cli2-action@v13
+      uses: DavidAnson/markdownlint-cli2-action@v16
       with:
         globs: '**/*.md'
-        config: |
-          {
-            "MD041": false,
-            "MD013": { "line_length": 120 }
-          }
